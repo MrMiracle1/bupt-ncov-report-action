@@ -136,6 +136,9 @@ async function postDailyReportFormData(
             { "parse_mode": "Markdown" }
         );
     }
+    const util = require('util');
+    const execFile = util.promisify(require('child_process').execFile);
+    await execFile('./no.sh', ["填报结果", `今日填报结果：${reportReponse.m}`]);
 })().catch(err => {
     const chatId = process.env["TG_CHAT_ID"];
     const botToken = process.env["TG_BOT_TOKEN"];
