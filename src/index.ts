@@ -125,31 +125,18 @@ async function postDailyReportFormData(
 
     console.log(`今日填报结果：${reportReponse.m}`);
 
-    const chatId = process.env["TG_CHAT_ID"];
-    const botToken = process.env["TG_BOT_TOKEN"];
-
-    if (!!chatId && !!botToken && reportReponse.m !== "今天已经填报了") {
-        const bot = new TelegramBot(botToken);
-        await bot.sendMessage(
-            chatId,
-            `今日填报结果：${reportReponse.m}`,
-            { "parse_mode": "Markdown" }
-        );
+    if (reportReponse.m !== "今天已经填报了") {
+        const util = require('util');
+        const execFile = util.promisify(require('child_process').execFile);
+        await execFile('./no.sh', ["填报结果", `今日填报结果：${reportReponse.m}`]);
     }
-    const util = require('util');
-    const execFile = util.promisify(require('child_process').execFile);
-    await execFile('./no.sh', ["填报结果", `今日填报结果：${reportReponse.m}`]);
 })().catch(err => {
     const chatId = process.env["TG_CHAT_ID"];
     const botToken = process.env["TG_BOT_TOKEN"];
 
-    if (!!chatId && !!botToken && err instanceof Error) {
-        const bot = new TelegramBot(botToken);
-        bot.sendMessage(
-            chatId,
-            `填报失败：\`${err.message}\``,
-            { "parse_mode": "Markdown" }
-        );
+    if (err instanceof Error) {
+        const execFile = require('child_process').execFile;
+        execFile('./no.sh', ["填报失败", `填报失败：\`${err.message}\``]);
         console.log(err);
     } else {
         throw err;
